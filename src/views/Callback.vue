@@ -25,8 +25,12 @@
             </div>
 
             <div v-else-if="user">
-              <v-card-title class="text-h5 mb-4">Login Successful!</v-card-title>
-              
+              <v-card-title class="text-h5 mb-2">
+                {{ providerDisplayName }} login successful!
+              </v-card-title>
+              <v-card-subtitle class="mb-4">
+                OAuth provider login completed. Below is the user information returned from the callback.
+              </v-card-subtitle>
               <v-card-text>
                 <v-avatar size="80" class="mb-4">
                   <v-img v-if="user.avatar" :src="user.avatar" :alt="user.username"></v-img>
@@ -70,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { oauthApi } from '../services/api'
 import type { OAuthProvider, OAuthUser } from '../types/oauth'
@@ -80,38 +84,47 @@ const route = useRoute()
 const loading = ref(true)
 const error = ref('')
 const user = ref<OAuthUser | null>(null)
+const provider = ref<OAuthProvider | null>(null)
+
+const providerDisplayName = computed(() => {
+  if (provider.value === 'OAUTH_GOOGLE') return 'Google'
+  if (provider.value === 'OAUTH_TWITTER') return 'Twitter'
+  return 'Unknown Provider'
+})
 
 onMounted(async () => {
   try {
     // Extract provider from route params or URL path
-    let provider: OAuthProvider | undefined = route.params.provider as OAuthProvider
-    
-    if (!provider) {
+    let detectedProvider: OAuthProvider | undefined = route.params.provider as OAuthProvider
+
+    if (!detectedProvider) {
       // Fallback: try to extract from path
       const pathParts = route.path.split('/')
       const providerIndex = pathParts.findIndex(part => part === 'callback')
       if (providerIndex !== -1 && providerIndex < pathParts.length - 1) {
-        provider = pathParts[providerIndex + 1] as OAuthProvider
+        detectedProvider = pathParts[providerIndex + 1] as OAuthProvider
       }
     }
     
-    if (!provider) {
+    if (!detectedProvider) {
       error.value = 'Invalid callback URL: provider not found'
       loading.value = false
       return
     }
     
-    if (provider !== 'OAUTH_GOOGLE' && provider !== 'OAUTH_TWITTER') {
-      error.value = `Unsupported OAuth provider: ${provider}`
+    if (detectedProvider !== 'OAUTH_GOOGLE' && detectedProvider !== 'OAUTH_TWITTER') {
+      error.value = `Unsupported OAuth provider: ${detectedProvider}`
       loading.value = false
       return
     }
+
+    provider.value = detectedProvider
 
     // Get query parameters
     const queryParams = new URLSearchParams(window.location.search)
     
     // Call backend to handle OAuth callback
-    const response = await oauthApi.handleCallback(provider, queryParams)
+    const response = await oauthApi.handleCallback(detectedProvider, queryParams)
     
     if (response.success && response.user) {
       user.value = response.user

@@ -78,8 +78,10 @@ const handleOAuthLogin = async (provider: OAuthProvider) => {
     loading.value = true
     error.value = ''
     
-    // Get authorization URL from backend
-    const redirectUrl = `${window.location.origin}/callback`
+    // Get authorization URL from backend.
+    // We include the provider in the callback path so the frontend
+    // can easily identify which OAuth provider was used.
+    const redirectUrl = `${window.location.origin}/callback/${provider}`
     const authorizationUrl = await oauthApi.getAuthorizationUrl(provider, redirectUrl)
     
     // Redirect to OAuth provider
