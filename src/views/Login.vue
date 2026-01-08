@@ -83,7 +83,7 @@ const handleOAuthLogin = async (provider: OAuthProvider) => {
     const authorizationUrl = await oauthApi.getAuthorizationUrl(provider," ")
     console.log("authorziedUrl:"+authorizationUrl);
     // Redirect to OAuth provider
-    // window.location.href = authorizationUrl
+    window.location.href = authorizationUrl
   } catch (err: any) {
     error.value = err.response?.data?.message || err.message || 'Failed to initiate OAuth login'
     loading.value = false
