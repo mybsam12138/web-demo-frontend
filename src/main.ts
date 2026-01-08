@@ -11,7 +11,8 @@ import Callback from './views/Callback.vue'
 
 const routes = [
   { path: '/', component: Login },
-  { path: '/callback/:provider?', component: Callback }
+  { path: '/callback/success', component: Callback },
+  { path: '/callback/error', component: Callback }
 ]
 
 const router = createRouter({
