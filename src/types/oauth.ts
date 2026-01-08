@@ -1,4 +1,4 @@
-export type OAuthProvider = 'OAUTH_GOOGLE' | 'OAUTH_TWITTER'
+export type OAuthProvider = 'OAUTH_GOOGLE' | 'OAUTH_TWITTER' | 'OAUTH_GITHUB'
 
 export interface OAuthUser {
   uuid: string
