@@ -8,14 +8,4 @@ export interface OAuthUser {
   email: string
 }
 
-export interface OAuthCallbackResponse {
-  success: boolean
-  user?: OAuthUser
-  redirectUrl?: string
-  error?: string
-}
-
-export interface AuthorizationUrlResponse {
-  authorizationUrl: string
-}
 
