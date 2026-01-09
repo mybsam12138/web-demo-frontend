@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { OAuthProvider } from '../types/oauth'
+import type { OAuthProvider, AuthorizationUrlResponse, UserVo } from '../types/oauth'
 
 const api = axios.create({
   baseURL: '/api',
@@ -14,13 +14,20 @@ export const oauthApi = {
    * Get authorization URL for OAuth provider
    */
   async getAuthorizationUrl(provider: OAuthProvider, redirectUrl?: string): Promise<string> {
-
-    const response = await api.get<string>(`/oauth/authorize/${provider}`, {
+    const response = await api.get<AuthorizationUrlResponse>(`/oauth/authorize/${provider}`, {
       params: {
         redirectUrl: redirectUrl || window.location.origin
       }
     })
-    return response.data;
+    return response.data.authorizationUrl
+  },
+
+  /**
+   * Get current user information
+   */
+  async getUserInfo(): Promise<UserVo> {
+    const response = await api.get<UserVo>('/user/info')
+    return response.data
   }
 }
 
