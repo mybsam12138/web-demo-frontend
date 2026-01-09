@@ -46,6 +46,22 @@
                 </v-icon>
                 Continue with Twitter
               </v-btn>
+
+              <v-btn
+                block
+                size="large"
+                color="#C71D23"
+                class="text-white"
+                :disabled="loading"
+                @click="handleOAuthLogin('OAUTH_GITEE')"
+              >
+                <v-icon start>
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="white">
+                    <path d="M11.984 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.016 0zm4.21 7.512c.797 0 1.445.648 1.445 1.445v6.486c0 .797-.648 1.445-1.445 1.445h-8.53c-.797 0-1.445-.648-1.445-1.445V8.957c0-.797.648-1.445 1.445-1.445h8.53zM9.14 12.232h2.156v1.078H9.14v-1.078zm0-2.156h4.312v1.078H9.14v-1.078zm0-2.156h4.312v1.078H9.14V7.92z"/>
+                  </svg>
+                </v-icon>
+                Continue with Gitee
+              </v-btn>
             </v-card-text>
 
             <v-alert

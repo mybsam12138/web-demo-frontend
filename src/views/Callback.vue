@@ -25,33 +25,26 @@
             </div>
 
             <div v-else-if="status === 'success'">
-              <v-card-title class="text-h5 mb-2">
-                Login Successful!
+              <v-card-title class="text-h5 mb-4">
+                Welcome back!
               </v-card-title>
-              <v-card-subtitle class="mb-4">
-                You have been successfully logged in via OAuth.
-              </v-card-subtitle>
-              <v-card-text>
+
+              <div v-if="userInfo" class="text-center mb-4">
+                <v-avatar size="80" class="mb-4">
+                  <v-img :src="userInfo.avatar" :alt="userInfo.nickname" />
+                </v-avatar>
+                <div class="text-h6 mb-2">{{ userInfo.nickname }}</div>
+                <div class="text-body-2 text-medium-emphasis">{{ userInfo.username }}</div>
+                <div class="text-caption text-medium-emphasis mt-1">
+                  Logged in via {{ getProviderName(userInfo.provider) }}
+                </div>
+              </div>
+
+              <v-card-text v-else>
                 <v-icon size="80" color="success" class="mb-4">mdi-check-circle</v-icon>
                 <p class="text-body-1">
-                  Your session has been created. You can now use the application.
+                  You have been successfully logged in via OAuth.
                 </p>
-
-                <div v-if="userInfo" class="mt-4">
-                  <v-divider class="mb-4"></v-divider>
-                  <h3 class="text-h6 mb-3">User Information</h3>
-                  <v-row class="mb-2">
-                    <v-col cols="12" class="d-flex align-center">
-                      <v-avatar size="48" class="mr-3">
-                        <v-img :src="userInfo.avatar" :alt="userInfo.nickname"></v-img>
-                      </v-avatar>
-                      <div>
-                        <div class="text-body-1 font-weight-medium">{{ userInfo.nickname }}</div>
-                        <div class="text-body-2 text-medium-emphasis">@{{ userInfo.username }}</div>
-                      </div>
-                    </v-col>
-                  </v-row>
-                </div>
               </v-card-text>
 
               <v-card-actions>
@@ -70,14 +63,31 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { oauthApi } from '../services/api'
-import type { UserVo } from '../types/oauth'
+import axios from 'axios'
 
 const route = useRoute()
 
 const status = ref<'loading' | 'success' | 'error'>('loading')
 const errorMessage = ref('')
-const userInfo = ref<UserVo | null>(null)
+const userInfo = ref<{
+  userId: string
+  username: string
+  provider: string
+  nickname: string
+  avatar: string
+  email?: string
+  token: string
+} | null>(null)
+
+const getProviderName = (provider: string) => {
+  const names: Record<string, string> = {
+    'OAUTH_GOOGLE': 'Google',
+    'OAUTH_TWITTER': 'Twitter',
+    'OAUTH_GITHUB': 'GitHub',
+    'OAUTH_GITEE': 'Gitee'
+  }
+  return names[provider] || provider
+}
 
 onMounted(async () => {
   // Check URL parameters for success or error
@@ -87,25 +97,35 @@ onMounted(async () => {
   // Check if this is a success or error callback
   if (route.path.includes('/callback/success')) {
     status.value = 'success'
-    await fetchUserInfo()
+
+    // Fetch user info from API
+    try {
+      const response = await axios.get('/api/user/info', {
+        withCredentials: true
+      })
+      userInfo.value = response.data
+    } catch (err: any) {
+      console.warn('Failed to fetch user info:', err)
+      // Don't set error status, just show generic success message
+    }
   } else if (route.path.includes('/callback/error') || message) {
     status.value = 'error'
     errorMessage.value = message || 'OAuth authentication failed'
   } else {
     // Default: treat as success if redirected from backend
     status.value = 'success'
-    await fetchUserInfo()
+
+    // Try to fetch user info
+    try {
+      const response = await axios.get('/api/user/info', {
+        withCredentials: true
+      })
+      userInfo.value = response.data
+    } catch (err: any) {
+      console.warn('Failed to fetch user info:', err)
+    }
   }
 })
-
-const fetchUserInfo = async () => {
-  try {
-    userInfo.value = await oauthApi.getUserInfo()
-  } catch (error) {
-    console.error('Failed to fetch user info:', error)
-    // Keep userInfo as null, don't show user info section
-  }
-}
 </script>
 
 <style scoped>

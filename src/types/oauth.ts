@@ -8,10 +8,4 @@ export interface OAuthUser {
   email: string
 }
 
-export interface UserVo {
-  username: string
-  nickname: string
-  avatar: string
-}
-
 
