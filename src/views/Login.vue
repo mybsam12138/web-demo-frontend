@@ -8,7 +8,7 @@
               OAuth Login Demo
             </v-card-title>
             <v-card-subtitle class="text-center mb-6">
-              Choose a provider to continue
+              Choose a provider to continue(Only gitee can be used cause the serve is in China, but the common package support different provider)
             </v-card-subtitle>
 
             <v-card-text>
