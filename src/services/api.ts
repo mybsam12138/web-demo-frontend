@@ -17,7 +17,7 @@ const getCookieValue = (name: string): string | null => {
  * Get satoken from cookie
  */
 const getSatoken = (): string | null => {
-  return getCookieValue('satoken')
+  return getCookieValue('Authorization')
 }
 
 const api = axios.create({
