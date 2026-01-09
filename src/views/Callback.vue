@@ -63,7 +63,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import axios from 'axios'
+import { api } from '../services/api'
 
 const route = useRoute()
 
@@ -100,9 +100,7 @@ onMounted(async () => {
 
     // Fetch user info from API
     try {
-      const response = await axios.get('/api/user/info', {
-        withCredentials: true
-      })
+      const response = await api.get('/user/info')
       userInfo.value = response.data
     } catch (err: any) {
       console.warn('Failed to fetch user info:', err)
@@ -117,9 +115,7 @@ onMounted(async () => {
 
     // Try to fetch user info
     try {
-      const response = await axios.get('/api/user/info', {
-        withCredentials: true
-      })
+      const response = await api.get('/user/info')
       userInfo.value = response.data
     } catch (err: any) {
       console.warn('Failed to fetch user info:', err)
